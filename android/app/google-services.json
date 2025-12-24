@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "164666468336",
+    "firebase_url": "https://sisinfo-adadb-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "sisinfo-adadb",
+    "storage_bucket": "sisinfo-adadb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:164666468336:android:83aee28c3331660a9f5f35",
+        "android_client_info": {
+          "package_name": "com.example.sisinfo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYxDlErffe52_nZw96i0P8oEv_qtgw3QY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
