@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
 import '../../models/patient_profile.dart';
-import '../admin/patient_detail_screen.dart';
+import 'doctor_patient_detail_screen.dart';
 import '../common/settings_screen.dart';
 
 class DoctorDashboardScreen extends StatelessWidget {
@@ -19,7 +19,42 @@ class DoctorDashboardScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: const Text('Dashboard Dokter'),
+        title: Row(
+          children: [
+            const Text('Dashboard Dokter'),
+            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.green.shade400,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.withOpacity(0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.medical_services, size: 14, color: Colors.white),
+                  SizedBox(width: 6),
+                  Text(
+                    'DOCTOR',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         backgroundColor: Colors.teal.shade700,
         foregroundColor: Colors.white,
         actions: [
@@ -115,8 +150,7 @@ class DoctorDashboardScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      DateFormat('EEEE, dd MMMM yyyy', 'id_ID')
-                          .format(DateTime.now()),
+                      DateFormat('EEEE, dd MMMM yyyy').format(DateTime.now()),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -259,28 +293,30 @@ class DoctorDashboardScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 32, color: color),
-            const SizedBox(height: 8),
+            Icon(icon, size: 28, color: color),
+            const SizedBox(height: 6),
             Text(
               value,
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: Colors.grey.shade600,
               ),
               textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -315,7 +351,7 @@ class DoctorDashboardScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PatientDetailScreen(patient: patient),
+              builder: (context) => DoctorPatientDetailScreen(patient: patient),
             ),
           );
         },

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../models/patient_profile.dart';
 import '../../services/firestore_service.dart';
-import '../../providers/auth_provider.dart';
 import '../../utils/validator.dart';
 import '../../utils/app_constants.dart';
+import '../../utils/error_handler.dart';
 
 class AddPatientScreen extends StatefulWidget {
   const AddPatientScreen({super.key});
@@ -42,8 +41,6 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final authProvider = context.read<AuthProvider>();
-
       // Create patient profile
       final profile = PatientProfile(
         id: '', // Will be set by Firestore
@@ -63,22 +60,18 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Pasien berhasil ditambahkan'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
+      ErrorHandler.showSuccessSnackBar(
+        context,
+        'Pasien berhasil ditambahkan',
       );
 
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal menambahkan pasien: $e'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
+      if (!mounted) return;
+      ErrorHandler.handleError(
+        context,
+        e,
+        customMessage: 'Gagal menambahkan pasien',
       );
     } finally {
       if (mounted) {

@@ -8,6 +8,7 @@ import 'statistics_screen.dart';
 import 'add_medical_record_screen.dart';
 import 'patient_detail_screen.dart';
 import 'manage_patients_screen.dart';
+import '../common/settings_screen.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -44,6 +45,17 @@ class AdminDashboard extends StatelessWidget {
                     );
                   },
                 ),
+                IconButton(
+                  icon: const Icon(Icons.settings, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SettingsScreen(),
+                      ),
+                    );
+                  },
+                ),
               ],
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
@@ -59,7 +71,7 @@ class AdminDashboard extends StatelessWidget {
                   ),
                   child: SafeArea(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -68,8 +80,8 @@ class AdminDashboard extends StatelessWidget {
                           Center(
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 16,
+                                horizontal: 16,
+                                vertical: 10,
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.2),
@@ -84,7 +96,7 @@ class AdminDashboard extends StatelessWidget {
                                 children: [
                                   // Medical Icon
                                   Container(
-                                    padding: const EdgeInsets.all(10),
+                                    padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(12),
@@ -92,7 +104,7 @@ class AdminDashboard extends StatelessWidget {
                                     child: Icon(
                                       Icons.local_hospital,
                                       color: Colors.blue.shade700,
-                                      size: 32,
+                                      size: 24,
                                     ),
                                   ),
                                   const SizedBox(width: 16),
@@ -105,9 +117,9 @@ class AdminDashboard extends StatelessWidget {
                                         'SIKESPA',
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: 28,
+                                          fontSize: 22,
                                           fontWeight: FontWeight.w900,
-                                          letterSpacing: 1.5,
+                                          letterSpacing: 1.2,
                                           shadows: [
                                             Shadow(
                                               color:
@@ -122,9 +134,9 @@ class AdminDashboard extends StatelessWidget {
                                         'Sistem Informasi Kesehatan',
                                         style: TextStyle(
                                           color: Colors.white.withOpacity(0.95),
-                                          fontSize: 11,
+                                          fontSize: 10,
                                           fontWeight: FontWeight.w500,
-                                          letterSpacing: 0.5,
+                                          letterSpacing: 0.3,
                                         ),
                                       ),
                                     ],
@@ -133,7 +145,7 @@ class AdminDashboard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 12),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -149,13 +161,55 @@ class AdminDashboard extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    authProvider.currentUser?.name ?? 'Admin',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        authProvider.currentUser?.name ??
+                                            'Admin',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange.shade400,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.orange
+                                                  .withOpacity(0.3),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.admin_panel_settings,
+                                                size: 12, color: Colors.white),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              'ADMIN',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                letterSpacing: 1,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -187,28 +241,31 @@ class AdminDashboard extends StatelessWidget {
                   final patientsWithAllergies =
                       patients.where((p) => p.allergies.isNotEmpty).length;
 
-                  return Container(
-                    margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _buildStatCard(
-                            icon: Icons.people,
-                            value: totalPatients.toString(),
-                            label: 'Total Pasien',
-                            color: Colors.blue,
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                    child: IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: _buildStatCard(
+                              icon: Icons.people,
+                              value: totalPatients.toString(),
+                              label: 'Total Pasien',
+                              color: Colors.blue,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildStatCard(
-                            icon: Icons.warning_amber,
-                            value: patientsWithAllergies.toString(),
-                            label: 'Ada Alergi',
-                            color: Colors.orange,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              icon: Icons.warning_amber,
+                              value: patientsWithAllergies.toString(),
+                              label: 'Ada Alergi',
+                              color: Colors.orange,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -583,7 +640,7 @@ class AdminDashboard extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -599,25 +656,28 @@ class AdminDashboard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(10),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(icon, color: Colors.white, size: 16),
             ),
-            child: Icon(icon, color: Colors.white, size: 20),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
+            const SizedBox(width: 6),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   value,
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -625,14 +685,14 @@ class AdminDashboard extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 8,
                     color: Colors.white.withOpacity(0.9),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

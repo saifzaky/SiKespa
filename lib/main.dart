@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:sikespa/utils/logger.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/patient_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/patient/dashboard_screen.dart';
+import 'screens/doctor/doctor_dashboard_screen.dart';
 import 'screens/admin/admin_dashboard.dart';
 import 'utils/app_colors.dart';
 import 'utils/app_constants.dart';
@@ -135,12 +137,19 @@ class AuthWrapper extends StatelessWidget {
     }
 
     // Route based on user role
+    AppLogger.d(
+        'DEBUG ROUTING - isPatient: ${authProvider.isPatient}, isDoctor: ${authProvider.isDoctor}, isAdmin: ${authProvider.isAdmin}');
+    AppLogger.d('DEBUG ROUTING - User role: ${authProvider.currentUser?.role}');
+
     if (authProvider.isPatient) {
-      return const DashboardScreen();
+      return const DashboardScreen(); // Patient Dashboard
     } else if (authProvider.isDoctor) {
-      return const AdminDashboard();
+      return const DoctorDashboardScreen(); // Doctor Dashboard
+    } else if (authProvider.isAdmin) {
+      return const AdminDashboard(); // Admin Dashboard
     }
 
+    // Fallback to login if role not recognized
     return const LoginScreen();
   }
 }

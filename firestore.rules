@@ -1,0 +1,209 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    /// Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    /// Get the role of the current user
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    /// Check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    /// Check if user is doctor
+    function isDoctor() {
+      return isAuthenticated() && getUserRole() == 'doctor';
+    }
+    
+    /// Check if user is patient
+    function isPatient() {
+      return isAuthenticated() && getUserRole() == 'patient';
+    }
+    
+    /// Check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    /// Check if doctor is assigned to patient
+    function isDoctorAssignedToPatient(patientId) {
+      return exists(/databases/$(database)/documents/doctorPatientAssignments/$(request.auth.uid + '_' + patientId));
+    }
+    
+    // ============================================
+    // Users Collection
+    // ============================================
+    match /users/{userId} {
+      // Users can read their own data, admin can read all
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      
+      // Anyone authenticated can create a user (for registration)
+      allow create: if isAuthenticated();
+      
+      // Users can update their own data, admin can update any
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      
+      // Only admin can delete users
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // Patients Collection
+    // ============================================
+    match /patients/{patientId} {
+      // Read: Patient can read own data, doctors can read all, admin can read all
+      allow read: if isAuthenticated() && 
+                     (isOwner(patientId) || isDoctor() || isAdmin());
+      
+      // Create: Only admin can create patient profiles
+      allow create: if isAdmin();
+      
+      // Update: Patient can update own profile, admin can update any
+      allow update: if isAuthenticated() && 
+                       (isOwner(patientId) || isAdmin());
+      
+      // Delete: Only admin can delete
+      allow delete: if isAdmin();
+      
+      // ------------------------------------------
+      // Medical Records Subcollection
+      // ------------------------------------------
+      match /medicalRecords/{recordId} {
+        // Read: Patient, assigned doctor, or admin
+        allow read: if isAuthenticated() && 
+                       (isOwner(patientId) || isDoctor() || isAdmin());
+        
+        // Create/Update: Only doctors and admins can create/modify medical records
+        allow create, update: if isAuthenticated() && 
+                                 (isDoctor() || isAdmin());
+        
+        // Delete: Only admin
+        allow delete: if isAdmin();
+      }
+      
+      // ------------------------------------------
+      // Vital Signs Subcollection
+      // ------------------------------------------
+      match /vitalSigns/{signId} {
+        // Read: Patient, doctor, or admin
+        allow read: if isAuthenticated() && 
+                       (isOwner(patientId) || isDoctor() || isAdmin());
+        
+        // Create/Update: Patient can add own vital signs, doctor and admin can add any
+        allow create, update: if isAuthenticated() && 
+                                 (isOwner(patientId) || isDoctor() || isAdmin());
+        
+        // Delete: Patient can delete own, admin can delete any
+        allow delete: if isAuthenticated() && 
+                         (isOwner(patientId) || isAdmin());
+      }
+      
+      // ------------------------------------------
+      // Treatment History Subcollection
+      // ------------------------------------------
+      match /treatmentHistory/{historyId} {
+        // Read: Patient, doctor, or admin
+        allow read: if isAuthenticated() && 
+                       (isOwner(patientId) || isDoctor() || isAdmin());
+        
+        // Create/Update: Only doctors and admins
+        allow create, update: if isAuthenticated() && 
+                                 (isDoctor() || isAdmin());
+        
+        // Delete: Only admin
+        allow delete: if isAdmin();
+      }
+      
+      // ------------------------------------------
+      // Schedules Subcollection
+      // ------------------------------------------
+      match /schedules/{scheduleId} {
+        // Read: Patient, doctor, or admin
+        allow read: if isAuthenticated() && 
+                       (isOwner(patientId) || isDoctor() || isAdmin());
+        
+        // Create: Patient can create own schedules, doctor and admin can create for anyone
+        allow create: if isAuthenticated() && 
+                         (isOwner(patientId) || isDoctor() || isAdmin());
+        
+        // Update: Patient can update own, doctor and admin can update any
+        allow update: if isAuthenticated() && 
+                         (isOwner(patientId) || isDoctor() || isAdmin());
+        
+        // Delete: Patient can delete own, admin can delete any
+        allow delete: if isAuthenticated() && 
+                         (isOwner(patientId) || isAdmin());
+      }
+    }
+    
+    // ============================================
+    // Doctor-Patient Assignments Collection
+    // ============================================
+    match /doctorPatientAssignments/{assignmentId} {
+      // Read: Anyone authenticated can read assignments
+      allow read: if isAuthenticated();
+      
+      // Create/Update/Delete: Only admin can manage assignments
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // ============================================
+    // Consultation Notes Collection (Future feature)
+    // ============================================
+    match /consultationNotes/{noteId} {
+      // Read: Patient (if it's their consultation), doctor who created it, or admin
+      allow read: if isAuthenticated() && 
+                     (resource.data.patientId == request.auth.uid || 
+                      resource.data.doctorId == request.auth.uid || 
+                      isAdmin());
+      
+      // Create/Update: Only doctors and admins
+      allow create, update: if isAuthenticated() && 
+                               (isDoctor() || isAdmin());
+      
+      // Delete: Only admin
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // Appointments Collection (Future feature)
+    // ============================================
+    match /appointments/{appointmentId} {
+      // Read: Patient (if it's their appointment), assigned doctor, or admin
+      allow read: if isAuthenticated() && 
+                     (resource.data.patientId == request.auth.uid || 
+                      resource.data.doctorId == request.auth.uid || 
+                      isAdmin());
+      
+      // Create: Patient can create appointments, doctors and admins too
+      allow create: if isAuthenticated();
+      
+      // Update: Patient, assigned doctor, or admin can update
+      allow update: if isAuthenticated() && 
+                       (resource.data.patientId == request.auth.uid || 
+                        resource.data.doctorId == request.auth.uid || 
+                        isAdmin());
+      
+      // Delete: Only admin can delete appointments
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // Default: Deny all other access
+    // ============================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

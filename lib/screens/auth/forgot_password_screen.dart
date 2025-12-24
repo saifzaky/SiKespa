@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/validator.dart';
+import '../../utils/error_handler.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -21,44 +23,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _resetPassword() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+    if (!_formKey.currentState!.validate()) return;
 
-      try {
-        final authProvider = context.read<AuthProvider>();
-        await authProvider.resetPassword(_emailController.text.trim());
+    setState(() => _isLoading = true);
 
-        if (mounted) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text(
-                'Email reset password telah dikirim. Silakan cek inbox Anda.',
-              ),
-              backgroundColor: Colors.green,
-              behavior: SnackBarBehavior.floating,
-              action: SnackBarAction(
-                label: 'OK',
-                textColor: Colors.white,
-                onPressed: () {},
-              ),
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: ${e.toString()}'),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
+    try {
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.resetPassword(_emailController.text.trim());
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+      ErrorHandler.showSuccessSnackBar(
+        context,
+        'Email reset password telah dikirim. Silakan cek inbox Anda.',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ErrorHandler.handleError(context, e);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -119,15 +104,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Email wajib diisi';
-                  }
-                  if (!value.contains('@')) {
-                    return 'Email tidak valid';
-                  }
-                  return null;
-                },
+                validator: Validator.email,
               ),
               const SizedBox(height: 32),
               // Reset Button

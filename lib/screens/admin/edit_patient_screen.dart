@@ -3,6 +3,7 @@ import '../../models/patient_profile.dart';
 import '../../services/firestore_service.dart';
 import '../../utils/validator.dart';
 import '../../utils/app_constants.dart';
+import '../../utils/error_handler.dart';
 
 class EditPatientScreen extends StatefulWidget {
   final PatientProfile patient;
@@ -83,22 +84,18 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Data pasien berhasil diperbarui'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
+      ErrorHandler.showSuccessSnackBar(
+        context,
+        'Data pasien berhasil diperbarui',
       );
 
       Navigator.pop(context, true); // Return true to indicate success
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal memperbarui data: $e'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
+      if (!mounted) return;
+      ErrorHandler.handleError(
+        context,
+        e,
+        customMessage: 'Gagal memperbarui data pasien',
       );
     } finally {
       if (mounted) {

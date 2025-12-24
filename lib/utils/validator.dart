@@ -149,4 +149,174 @@ class Validator {
 
     return null;
   }
+
+  /// Validate blood type
+  static String? bloodType(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Golongan darah tidak boleh kosong';
+    }
+
+    final validTypes = ['A', 'B', 'AB', 'O'];
+    final type = value.replaceAll('+', '').replaceAll('-', '').toUpperCase();
+
+    if (!validTypes.contains(type)) {
+      return 'Golongan darah tidak valid (A, B, AB, O)';
+    }
+
+    return null;
+  }
+
+  /// Validate systolic blood pressure
+  static String? systolicBP(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Tekanan darah sistolik tidak boleh kosong';
+    }
+
+    final bp = int.tryParse(value);
+    if (bp == null) {
+      return 'Harus berupa angka';
+    }
+
+    if (bp < 70 || bp > 250) {
+      return 'Nilai tidak valid (70-250 mmHg)';
+    }
+
+    return null;
+  }
+
+  /// Validate diastolic blood pressure
+  static String? diastolicBP(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Tekanan darah diastolik tidak boleh kosong';
+    }
+
+    final bp = int.tryParse(value);
+    if (bp == null) {
+      return 'Harus berupa angka';
+    }
+
+    if (bp < 40 || bp > 150) {
+      return 'Nilai tidak valid (40-150 mmHg)';
+    }
+
+    return null;
+  }
+
+  /// Validate heart rate
+  static String? heartRate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Detak jantung tidak boleh kosong';
+    }
+
+    final hr = int.tryParse(value);
+    if (hr == null) {
+      return 'Harus berupa angka';
+    }
+
+    if (hr < 30 || hr > 220) {
+      return 'Nilai tidak valid (30-220 bpm)';
+    }
+
+    return null;
+  }
+
+  /// Validate temperature
+  static String? temperature(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Suhu tubuh tidak boleh kosong';
+    }
+
+    final temp = double.tryParse(value);
+    if (temp == null) {
+      return 'Harus berupa angka';
+    }
+
+    if (temp < 30.0 || temp > 45.0) {
+      return 'Nilai tidak valid (30-45°C)';
+    }
+
+    return null;
+  }
+
+  /// Validate weight
+  static String? weight(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Berat badan tidak boleh kosong';
+    }
+
+    final weight = double.tryParse(value);
+    if (weight == null) {
+      return 'Harus berupa angka';
+    }
+
+    if (weight < 0.5 || weight > 500) {
+      return 'Nilai tidak valid (0.5-500 kg)';
+    }
+
+    return null;
+  }
+
+  /// Validate height
+  static String? height(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Tinggi badan tidak boleh kosong';
+    }
+
+    final height = double.tryParse(value);
+    if (height == null) {
+      return 'Harus berupa angka';
+    }
+
+    if (height < 30 || height > 300) {
+      return 'Nilai tidak valid (30-300 cm)';
+    }
+
+    return null;
+  }
+
+  /// Validate blood sugar
+  static String? bloodSugar(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+
+    final sugar = int.tryParse(value);
+    if (sugar == null) {
+      return 'Harus berupa angka';
+    }
+
+    if (sugar < 0 || sugar > 600) {
+      return 'Nilai tidak valid (0-600 mg/dL)';
+    }
+
+    return null;
+  }
+
+  /// Check if vital signs are in normal range (for warnings, not validation)
+  static String? getVitalSignWarning({
+    int? systolic,
+    int? diastolic,
+    int? heartRate,
+    double? temperature,
+  }) {
+    final warnings = <String>[];
+
+    if (systolic != null && (systolic < 90 || systolic > 140)) {
+      warnings.add('Tekanan sistolik di luar normal (90-140)');
+    }
+
+    if (diastolic != null && (diastolic < 60 || diastolic > 90)) {
+      warnings.add('Tekanan diastolik di luar normal (60-90)');
+    }
+
+    if (heartRate != null && (heartRate < 60 || heartRate > 100)) {
+      warnings.add('Detak jantung di luar normal (60-100)');
+    }
+
+    if (temperature != null && (temperature < 36.0 || temperature > 37.5)) {
+      warnings.add('Suhu tubuh di luar normal (36-37.5°C)');
+    }
+
+    return warnings.isEmpty ? null : warnings.join('\n');
+  }
 }

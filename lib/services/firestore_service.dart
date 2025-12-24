@@ -4,6 +4,8 @@ import '../models/vital_signs.dart';
 import '../models/medical_record.dart';
 import '../models/treatment_history.dart';
 import '../models/schedule.dart';
+import '../models/prescription.dart';
+import '../models/treatment_note.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -227,6 +229,134 @@ class FirestoreService {
     } catch (e) {
       print('Error deleting patient: $e');
       rethrow;
+    }
+  }
+
+  // ========== PRESCRIPTIONS ==========
+
+  Future<void> addPrescription(Prescription prescription) async {
+    await _firestore
+        .collection('prescriptions')
+        .doc(prescription.id)
+        .set(prescription.toMap());
+  }
+
+  Future<void> updatePrescription(Prescription prescription) async {
+    await _firestore
+        .collection('prescriptions')
+        .doc(prescription.id)
+        .update(prescription.toMap());
+  }
+
+  Future<void> deletePrescription(String prescriptionId) async {
+    await _firestore.collection('prescriptions').doc(prescriptionId).delete();
+  }
+
+  // Get prescriptions for a patient
+  Stream<List<Prescription>> streamPatientPrescriptions(String patientId) {
+    return _firestore
+        .collection('prescriptions')
+        .where('patientId', isEqualTo: patientId)
+        .orderBy('prescribedDate', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Prescription.fromMap(doc.data()))
+            .toList());
+  }
+
+  // Get active prescriptions for a patient
+  Future<List<Prescription>> getActivePrescriptions(String patientId) async {
+    try {
+      final query = await _firestore
+          .collection('prescriptions')
+          .where('patientId', isEqualTo: patientId)
+          .where('isActive', isEqualTo: true)
+          .orderBy('prescribedDate', descending: true)
+          .get();
+
+      return query.docs
+          .map((doc) => Prescription.fromMap(doc.data()))
+          .where((p) => !p.isExpired)
+          .toList();
+    } catch (e) {
+      print('Error getting active prescriptions: $e');
+      return [];
+    }
+  }
+
+  // Get prescriptions by doctor
+  Stream<List<Prescription>> streamDoctorPrescriptions(String doctorId) {
+    return _firestore
+        .collection('prescriptions')
+        .where('doctorId', isEqualTo: doctorId)
+        .orderBy('prescribedDate', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Prescription.fromMap(doc.data()))
+            .toList());
+  }
+
+  // ========== TREATMENT NOTES ==========
+
+  Future<void> addTreatmentNote(TreatmentNote note) async {
+    await _firestore
+        .collection('treatment_notes')
+        .doc(note.id)
+        .set(note.toMap());
+  }
+
+  Future<void> updateTreatmentNote(TreatmentNote note) async {
+    await _firestore
+        .collection('treatment_notes')
+        .doc(note.id)
+        .update(note.toMap());
+  }
+
+  Future<void> deleteTreatmentNote(String noteId) async {
+    await _firestore.collection('treatment_notes').doc(noteId).delete();
+  }
+
+  // Get treatment notes for a patient
+  Stream<List<TreatmentNote>> streamPatientTreatmentNotes(String patientId) {
+    return _firestore
+        .collection('treatment_notes')
+        .where('patientId', isEqualTo: patientId)
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TreatmentNote.fromMap(doc.data()))
+            .toList());
+  }
+
+  // Get treatment notes by doctor
+  Stream<List<TreatmentNote>> streamDoctorTreatmentNotes(String doctorId) {
+    return _firestore
+        .collection('treatment_notes')
+        .where('doctorId', isEqualTo: doctorId)
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => TreatmentNote.fromMap(doc.data()))
+            .toList());
+  }
+
+  // Get latest treatment note for a patient
+  Future<TreatmentNote?> getLatestTreatmentNote(String patientId) async {
+    try {
+      final query = await _firestore
+          .collection('treatment_notes')
+          .where('patientId', isEqualTo: patientId)
+          .orderBy('date', descending: true)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        return TreatmentNote.fromMap(query.docs.first.data());
+      }
+      return null;
+    } catch (e) {
+      print('Error getting latest treatment note: $e');
+      return null;
     }
   }
 }

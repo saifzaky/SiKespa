@@ -32,6 +32,7 @@ class AuthService {
       if (doc.exists) {
         final userModel = UserModel.fromMap(doc.data()!);
         AppLogger.d('User model loaded successfully: ${userModel.email}');
+        AppLogger.d('DEBUG - User role: ${userModel.role}'); // DEBUG
         return Result.success(userModel);
       }
 
@@ -182,6 +183,54 @@ class AuthService {
     } catch (e, stackTrace) {
       AppLogger.e('Unexpected error during password reset', e, stackTrace);
       return Result.failure('Gagal mengirim email: ${e.toString()}');
+    }
+  }
+
+  // Get current Firebase user
+  Future<User?> getCurrentUser() async {
+    return currentUser;
+  }
+
+  // Re-authenticate user with password
+  Future<void> reauthenticateUser(String email, String password) async {
+    try {
+      final user = currentUser;
+      if (user == null) {
+        throw AuthException('User tidak ditemukan');
+      }
+
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      AppLogger.i('User re-authenticated successfully');
+    } on FirebaseAuthException catch (e, stackTrace) {
+      AppLogger.e('Error re-authenticating user', e, stackTrace);
+      throw AuthException.fromFirebaseError(e.code);
+    } catch (e, stackTrace) {
+      AppLogger.e('Unexpected error during re-authentication', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  // Update user password
+  Future<void> updatePassword(String newPassword) async {
+    try {
+      final user = currentUser;
+      if (user == null) {
+        throw AuthException('User tidak ditemukan');
+      }
+
+      await user.updatePassword(newPassword);
+      AppLogger.i('Password updated successfully');
+    } on FirebaseAuthException catch (e, stackTrace) {
+      AppLogger.e('Error updating password', e, stackTrace);
+      throw AuthException.fromFirebaseError(e.code);
+    } catch (e, stackTrace) {
+      AppLogger.e('Unexpected error during password update', e, stackTrace);
+      rethrow;
     }
   }
 }

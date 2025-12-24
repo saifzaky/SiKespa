@@ -1,0 +1,175 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    /// Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    /// Get user role from Firestore
+    function getUserRole() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    /// Check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    /// Check if user is doctor
+    function isDoctor() {
+      return isAuthenticated() && getUserRole() == 'doctor';
+    }
+    
+    /// Check if user is patient
+    function isPatient() {
+      return isAuthenticated() && getUserRole() == 'patient';
+    }
+    
+    /// Validate file size (max 10MB)
+    function isValidFileSize() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+    
+    /// Validate image file type
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    /// Validate document file type (PDF, images)
+    function isValidDocument() {
+      return request.resource.contentType.matches('image/.*') ||
+             request.resource.contentType.matches('application/pdf');
+    }
+    
+    // ============================================
+    // Medical Documents
+    // Stored as: medical_documents/{patientId}/{fileName}
+    // ============================================
+    match /medical_documents/{patientId}/{fileName} {
+      // Read: Patient (owner), doctors, or admin
+      allow read: if isAuthenticated() && 
+                     (request.auth.uid == patientId || isDoctor() || isAdmin());
+      
+      // Write: Patient (owner), doctors, or admin
+      // Must be valid document type and size
+      allow write: if isAuthenticated() && 
+                      (request.auth.uid == patientId || isDoctor() || isAdmin()) &&
+                      isValidDocument() &&
+                      isValidFileSize();
+      
+      // Delete: Patient (owner) or admin only
+      allow delete: if isAuthenticated() && 
+                       (request.auth.uid == patientId || isAdmin());
+    }
+    
+    // ============================================
+    // Profile Pictures
+    // Stored as: profile_pictures/{userId}/{fileName}
+    // ============================================
+    match /profile_pictures/{userId}/{fileName} {
+      // Read: Anyone authenticated can view profile pictures
+      allow read: if isAuthenticated();
+      
+      // Write: User can upload their own profile picture
+      // Must be image and within size limit
+      allow write: if isAuthenticated() && 
+                      request.auth.uid == userId &&
+                      isImage() &&
+                      isValidFileSize();
+      
+      // Delete: User can delete their own picture, or admin
+      allow delete: if isAuthenticated() && 
+                       (request.auth.uid == userId || isAdmin());
+    }
+    
+    // ============================================
+    // Lab Results / Documents
+    // Stored as: lab_results/{patientId}/{fileName}
+    // ============================================
+    match /lab_results/{patientId}/{fileName} {
+      // Read: Patient (owner), doctors, or admin
+      allow read: if isAuthenticated() && 
+                     (request.auth.uid == patientId || isDoctor() || isAdmin());
+      
+      // Write: Only doctors and admins can upload lab results
+      allow write: if isAuthenticated() && 
+                      (isDoctor() || isAdmin()) &&
+                      isValidDocument() &&
+                      isValidFileSize();
+      
+      // Delete: Only admin can delete lab results
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // Prescriptions
+    // Stored as: prescriptions/{patientId}/{fileName}
+    // ============================================
+    match /prescriptions/{patientId}/{fileName} {
+      // Read: Patient (owner), doctors, or admin
+      allow read: if isAuthenticated() && 
+                     (request.auth.uid == patientId || isDoctor() || isAdmin());
+      
+      // Write: Only doctors and admins can upload prescriptions
+      allow write: if isAuthenticated() && 
+                      (isDoctor() || isAdmin()) &&
+                      isValidDocument() &&
+                      isValidFileSize();
+      
+      // Delete: Only admin can delete prescriptions
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // X-Ray / Imaging Results
+    // Stored as: xray_images/{patientId}/{fileName}
+    // ============================================
+    match /xray_images/{patientId}/{fileName} {
+      // Read: Patient (owner), doctors, or admin
+      allow read: if isAuthenticated() && 
+                     (request.auth.uid == patientId || isDoctor() || isAdmin());
+      
+      // Write: Only doctors and admins can upload X-rays
+      allow write: if isAuthenticated() && 
+                      (isDoctor() || isAdmin()) &&
+                      isImage() &&
+                      isValidFileSize();
+      
+      // Delete: Only admin can delete X-rays
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // General Documents (catch-all)
+    // Stored as: documents/{patientId}/{fileName}
+    // ============================================
+    match /documents/{patientId}/{fileName} {
+      // Read: Patient (owner), doctors, or admin
+      allow read: if isAuthenticated() && 
+                     (request.auth.uid == patientId || isDoctor() || isAdmin());
+      
+      // Write: Patient, doctors, or admin
+      allow write: if isAuthenticated() && 
+                      (request.auth.uid == patientId || isDoctor() || isAdmin()) &&
+                      isValidDocument() &&
+                      isValidFileSize();
+      
+      // Delete: Patient (owner) or admin
+      allow delete: if isAuthenticated() && 
+                       (request.auth.uid == patientId || isAdmin());
+    }
+    
+    // ============================================
+    // Default: Deny all other access
+    // ============================================
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

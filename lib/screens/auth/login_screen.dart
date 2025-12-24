@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/validator.dart';
 import '../../utils/app_constants.dart';
+import '../../utils/error_handler.dart';
 import './register_screen.dart';
 import './forgot_password_screen.dart';
 
@@ -40,13 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!success) {
       final errorMessage = authProvider.errorMessage ??
           'Login gagal. Periksa email dan password Anda.';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      ErrorHandler.showErrorSnackBar(context, errorMessage);
     }
   }
 

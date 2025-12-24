@@ -151,7 +151,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       context: context,
       builder: (context) => _AddScheduleDialog(
         onAdd: (schedule) async {
-          final authProvider = context.read<AuthProvider>();
           await _firestoreService.addSchedule(schedule);
 
           if (schedule.reminderEnabled) {

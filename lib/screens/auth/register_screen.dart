@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/validator.dart';
 import '../../utils/app_constants.dart';
+import '../../utils/error_handler.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -46,24 +47,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Registrasi berhasil!'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      ErrorHandler.showSuccessSnackBar(context, 'Registrasi berhasil!');
       Navigator.pop(context);
     } else {
       final errorMessage = authProvider.errorMessage ??
           'Registrasi gagal. Email mungkin sudah terdaftar.';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      ErrorHandler.showErrorSnackBar(context, errorMessage);
     }
   }
 

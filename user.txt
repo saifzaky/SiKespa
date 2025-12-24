@@ -2,3 +2,7 @@ admin = {
     email: admin@sikespa.com,
     password: adminsikespa
 }
+doctor = {
+    email: doctor@sikespa.com,
+    password: doctorsikespa
+}

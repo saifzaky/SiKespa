@@ -1,6 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:timezone/timezone.dart' as tz;
+import '../utils/logger.dart';
 
 class NotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications =
@@ -14,7 +15,9 @@ class NotificationService {
         await _firebaseMessaging.requestPermission();
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted notification permission');
+      AppLogger.i('User granted notification permission');
+    } else {
+      AppLogger.w('User denied notification permission');
     }
 
     // Initialize local notifications
@@ -36,7 +39,7 @@ class NotificationService {
 
   void _onNotificationTapped(NotificationResponse response) {
     // Handle notification tap
-    print('Notification tapped: ${response.payload}');
+    AppLogger.d('Notification tapped: ${response.payload}');
   }
 
   void _handleForegroundMessage(RemoteMessage message) {

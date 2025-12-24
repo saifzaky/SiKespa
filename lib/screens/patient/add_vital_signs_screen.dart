@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/firestore_service.dart';
 import '../../models/vital_signs.dart';
+import '../../utils/validator.dart';
+import '../../utils/error_handler.dart';
 
 class AddVitalSignsScreen extends StatefulWidget {
   const AddVitalSignsScreen({super.key});
@@ -39,50 +41,59 @@ class _AddVitalSignsScreenState extends State<AddVitalSignsScreen> {
   }
 
   Future<void> _saveVitalSigns() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+    if (!_formKey.currentState!.validate()) return;
 
-      try {
-        final authProvider = context.read<AuthProvider>();
-        final userId = authProvider.currentUser!.uid;
+    setState(() => _isLoading = true);
 
-        final vitalSigns = VitalSigns(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          patientId: userId,
-          date: DateTime.now(),
-          bloodPressure:
-              '${_systolicController.text}/${_diastolicController.text}',
-          heartRate: int.parse(_heartRateController.text),
-          temperature: double.parse(_temperatureController.text),
-          weight: double.parse(_weightController.text),
-          bloodSugar: double.parse(_bloodSugarController.text),
-          notes: _notesController.text.trim(),
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final userId = authProvider.currentUser!.uid;
+
+      final vitalSigns = VitalSigns(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        patientId: userId,
+        date: DateTime.now(),
+        bloodPressure:
+            '${_systolicController.text}/${_diastolicController.text}',
+        heartRate: int.parse(_heartRateController.text),
+        temperature: double.parse(_temperatureController.text),
+        weight: double.parse(_weightController.text),
+        bloodSugar: double.parse(_bloodSugarController.text),
+        notes: _notesController.text.trim(),
+      );
+
+      await _firestoreService.addVitalSigns(userId, vitalSigns);
+
+      if (!mounted) return;
+
+      // Show warning if vital signs are abnormal
+      final warning = Validator.getVitalSignWarning(
+        systolic: int.parse(_systolicController.text),
+        diastolic: int.parse(_diastolicController.text),
+        heartRate: int.parse(_heartRateController.text),
+        temperature: double.parse(_temperatureController.text),
+      );
+
+      if (warning != null) {
+        ErrorHandler.showWarningSnackBar(context, 'Peringatan! $warning');
+      } else {
+        ErrorHandler.showSuccessSnackBar(
+          context,
+          'Data vital signs berhasil disimpan',
         );
+      }
 
-        await _firestoreService.addVitalSigns(userId, vitalSigns);
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Data vital signs berhasil disimpan'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.pop(context, true);
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+      ErrorHandler.handleError(
+        context,
+        e,
+        customMessage: 'Gagal menyimpan data vital signs',
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -150,16 +161,7 @@ class _AddVitalSignsScreenState extends State<AddVitalSignsScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Wajib diisi';
-                        }
-                        final num = int.tryParse(value);
-                        if (num == null || num < 70 || num > 200) {
-                          return 'Range: 70-200';
-                        }
-                        return null;
-                      },
+                      validator: Validator.systolicBP,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -180,16 +182,7 @@ class _AddVitalSignsScreenState extends State<AddVitalSignsScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Wajib diisi';
-                        }
-                        final num = int.tryParse(value);
-                        if (num == null || num < 40 || num > 130) {
-                          return 'Range: 40-130';
-                        }
-                        return null;
-                      },
+                      validator: Validator.diastolicBP,
                     ),
                   ),
                 ],
@@ -218,16 +211,7 @@ class _AddVitalSignsScreenState extends State<AddVitalSignsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Wajib diisi';
-                  }
-                  final num = int.tryParse(value);
-                  if (num == null || num < 40 || num > 200) {
-                    return 'Range normal: 40-200 bpm';
-                  }
-                  return null;
-                },
+                validator: Validator.heartRate,
               ),
               const SizedBox(height: 16),
 
@@ -254,16 +238,7 @@ class _AddVitalSignsScreenState extends State<AddVitalSignsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Wajib diisi';
-                  }
-                  final num = double.tryParse(value);
-                  if (num == null || num < 35 || num > 42) {
-                    return 'Range normal: 35-42°C';
-                  }
-                  return null;
-                },
+                validator: Validator.temperature,
               ),
               const SizedBox(height: 16),
 
@@ -290,16 +265,7 @@ class _AddVitalSignsScreenState extends State<AddVitalSignsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Wajib diisi';
-                  }
-                  final num = double.tryParse(value);
-                  if (num == null || num < 20 || num > 300) {
-                    return 'Range: 20-300 kg';
-                  }
-                  return null;
-                },
+                validator: Validator.weight,
               ),
               const SizedBox(height: 16),
 
@@ -326,16 +292,7 @@ class _AddVitalSignsScreenState extends State<AddVitalSignsScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Wajib diisi';
-                  }
-                  final num = double.tryParse(value);
-                  if (num == null || num < 50 || num > 500) {
-                    return 'Range: 50-500 mg/dL';
-                  }
-                  return null;
-                },
+                validator: Validator.bloodSugar,
               ),
               const SizedBox(height: 16),
 

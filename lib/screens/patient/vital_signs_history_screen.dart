@@ -25,8 +25,8 @@ class VitalSignsHistoryScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Tambah Data',
-            onPressed: () async {
-              final result = await Navigator.push(
+            onPressed: () {
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const AddVitalSignsScreen(),

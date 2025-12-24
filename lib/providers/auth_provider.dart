@@ -13,8 +13,8 @@ class AuthProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isLoggedIn => _currentUser != null;
   bool get isPatient => _currentUser?.role == 'patient';
-  bool get isDoctor =>
-      _currentUser?.role == 'doctor' || _currentUser?.role == 'admin';
+  bool get isDoctor => _currentUser?.role == 'doctor';
+  bool get isAdmin => _currentUser?.role == 'admin';
   String? get errorMessage => _errorMessage;
 
   AuthProvider() {
@@ -159,6 +159,27 @@ class AuthProvider with ChangeNotifier {
         return false;
       },
     );
+  }
+
+  Future<void> changePassword(
+      String currentPassword, String newPassword) async {
+    try {
+      final user = await _authService.getCurrentUser();
+      if (user == null) {
+        throw Exception('User tidak ditemukan');
+      }
+
+      // Re-authenticate user with current password
+      await _authService.reauthenticateUser(user.email!, currentPassword);
+
+      // Update to new password
+      await _authService.updatePassword(newPassword);
+
+      AppLogger.i('Password changed successfully for: ${user.email}');
+    } catch (e, stackTrace) {
+      AppLogger.e('Error changing password', e, stackTrace);
+      rethrow;
+    }
   }
 
   void clearError() {
