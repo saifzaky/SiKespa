@@ -9,6 +9,8 @@ import './profile_screen.dart';
 import './medical_records_screen.dart';
 import './treatment_history_screen.dart';
 import './schedule_screen.dart';
+import './vital_signs_history_screen.dart';
+import './add_vital_signs_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -221,6 +223,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           const Expanded(child: SizedBox()),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      // View All Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const VitalSignsHistoryScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.show_chart),
+                          label: const Text('Lihat Riwayat \u0026 Grafik'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.all(12),
+                            side: BorderSide(color: Colors.blue.shade700),
+                            foregroundColor: Colors.blue.shade700,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -315,64 +340,73 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      children: [
-                        _buildMenuCard(
-                          context,
-                          'Profil',
-                          Icons.person,
-                          Colors.blue,
-                          () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ProfileScreen(),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Responsive column count
+                        final isWideScreen = constraints.maxWidth > 600;
+                        final crossAxisCount = isWideScreen ? 4 : 2;
+
+                        return GridView.count(
+                          crossAxisCount: crossAxisCount,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: isWideScreen ? 1.1 : 1.0,
+                          children: [
+                            _buildMenuCard(
+                              context,
+                              'Profil',
+                              Icons.person,
+                              Colors.blue,
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ProfileScreen(),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        _buildMenuCard(
-                          context,
-                          'Rekam Medis',
-                          Icons.medical_services,
-                          Colors.red,
-                          () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const MedicalRecordsScreen(),
+                            _buildMenuCard(
+                              context,
+                              'Rekam Medis',
+                              Icons.medical_services,
+                              Colors.red,
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const MedicalRecordsScreen(),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        _buildMenuCard(
-                          context,
-                          'Riwayat',
-                          Icons.history,
-                          Colors.orange,
-                          () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const TreatmentHistoryScreen(),
+                            _buildMenuCard(
+                              context,
+                              'Riwayat',
+                              Icons.history,
+                              Colors.orange,
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const TreatmentHistoryScreen(),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        _buildMenuCard(
-                          context,
-                          'Jadwal',
-                          Icons.calendar_today,
-                          Colors.green,
-                          () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ScheduleScreen(),
+                            _buildMenuCard(
+                              context,
+                              'Jadwal',
+                              Icons.calendar_today,
+                              Colors.green,
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ScheduleScreen(),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ],
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),

@@ -1,81 +1,101 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../models/patient_profile.dart';
 import '../../services/firestore_service.dart';
-import '../../providers/auth_provider.dart';
 import '../../utils/validator.dart';
 import '../../utils/app_constants.dart';
 
-class AddPatientScreen extends StatefulWidget {
-  const AddPatientScreen({super.key});
+class EditPatientScreen extends StatefulWidget {
+  final PatientProfile patient;
+
+  const EditPatientScreen({
+    super.key,
+    required this.patient,
+  });
 
   @override
-  State<AddPatientScreen> createState() => _AddPatientScreenState();
+  State<EditPatientScreen> createState() => _EditPatientScreenState();
 }
 
-class _AddPatientScreenState extends State<AddPatientScreen> {
+class _EditPatientScreenState extends State<EditPatientScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _ageController = TextEditingController();
-  final _emergencyContactController = TextEditingController();
-  final _insuranceNumberController = TextEditingController();
+  late final TextEditingController _nameController;
+  late final TextEditingController _ageController;
+  late final TextEditingController _emergencyContactController;
+  late final TextEditingController _insuranceNumberController;
 
-  String _selectedBloodType = 'A+';
-  String _selectedGender = 'Laki-laki';
-  final List<String> _selectedAllergies = [];
+  late String _selectedBloodType;
+  late String _selectedGender;
+  late String _allergiesText;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.patient.name);
+    _ageController = TextEditingController(text: widget.patient.age.toString());
+    _emergencyContactController =
+        TextEditingController(text: widget.patient.emergencyContact);
+    _insuranceNumberController =
+        TextEditingController(text: widget.patient.insuranceNumber);
+    _selectedBloodType = widget.patient.bloodType;
+    _selectedGender = widget.patient.gender;
+    _allergiesText = widget.patient.allergies.join(', ');
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose();
     _ageController.dispose();
     _emergencyContactController.dispose();
     _insuranceNumberController.dispose();
     super.dispose();
   }
 
-  Future<void> _savePatient() async {
+  Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      final authProvider = context.read<AuthProvider>();
+      final allergies = _allergiesText.isNotEmpty
+          ? _allergiesText
+              .split(',')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList()
+          : <String>[];
 
-      // Create patient profile
-      final profile = PatientProfile(
-        id: '', // Will be set by Firestore
-        userId:
-            _emailController.text.trim(), // Temporary, should be actual user ID
+      final updatedProfile = PatientProfile(
+        id: widget.patient.id,
+        userId: widget.patient.userId,
         name: _nameController.text.trim(),
         age: int.parse(_ageController.text),
         gender: _selectedGender,
         bloodType: _selectedBloodType,
-        allergies: _selectedAllergies,
+        allergies: allergies,
         emergencyContact: _emergencyContactController.text.trim(),
         insuranceNumber: _insuranceNumberController.text.trim(),
+        photoUrl: widget.patient.photoUrl,
       );
 
       final firestoreService = FirestoreService();
-      await firestoreService.createOrUpdatePatientProfile(profile);
+      await firestoreService.createOrUpdatePatientProfile(updatedProfile);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Pasien berhasil ditambahkan'),
+          content: Text('Data pasien berhasil diperbarui'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
       );
 
-      Navigator.pop(context);
+      Navigator.pop(context, true); // Return true to indicate success
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Gagal menambahkan pasien: $e'),
+          content: Text('Gagal memperbarui data: $e'),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
         ),
@@ -91,8 +111,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Pasien Baru'),
-        backgroundColor: Colors.blue,
+        title: const Text('Edit Data Pasien'),
+        backgroundColor: Colors.blue.shade700,
         foregroundColor: Colors.white,
       ),
       body: Form(
@@ -104,28 +124,13 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
             TextFormField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: 'Nama Lengkap',
+                labelText: ' Nama Lengkap',
                 prefixIcon: const Icon(Icons.person),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
               validator: Validator.name,
-            ),
-            const SizedBox(height: 16),
-
-            // Email (temporary for user ID)
-            TextFormField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                prefixIcon: const Icon(Icons.email),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              validator: Validator.email,
             ),
             const SizedBox(height: 16),
 
@@ -198,6 +203,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
 
             // Allergies
             TextFormField(
+              initialValue: _allergiesText,
               decoration: InputDecoration(
                 labelText: 'Alergi (pisahkan dengan koma)',
                 prefixIcon: const Icon(Icons.warning),
@@ -207,17 +213,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                 helperText: 'Contoh: Penicillin, Kacang, Seafood',
               ),
               onChanged: (value) {
-                setState(() {
-                  _selectedAllergies.clear();
-                  if (value.isNotEmpty) {
-                    _selectedAllergies.addAll(
-                      value
-                          .split(',')
-                          .map((e) => e.trim())
-                          .where((e) => e.isNotEmpty),
-                    );
-                  }
-                });
+                _allergiesText = value;
               },
             ),
             const SizedBox(height: 16),
@@ -255,9 +251,9 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
             SizedBox(
               height: 50,
               child: ElevatedButton(
-                onPressed: _isLoading ? null : _savePatient,
+                onPressed: _isLoading ? null : _saveChanges,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Colors.blue.shade700,
                   foregroundColor: Colors.white,
                 ),
                 child: _isLoading
@@ -270,7 +266,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                         ),
                       )
                     : const Text(
-                        'Simpan Pasien',
+                        'Simpan Perubahan',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

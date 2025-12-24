@@ -36,8 +36,8 @@ class PatientProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addVitalSigns(VitalSigns vitalSigns) async {
-    await _firestoreService.addVitalSigns(vitalSigns);
+  Future<void> addVitalSigns(String userId, VitalSigns vitalSigns) async {
+    await _firestoreService.addVitalSigns(userId, vitalSigns);
     _latestVitalSigns = vitalSigns;
     notifyListeners();
   }

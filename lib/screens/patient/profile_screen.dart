@@ -21,6 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   late TextEditingController _nameController;
   late TextEditingController _ageController;
+  late TextEditingController _genderController;
   late TextEditingController _bloodTypeController;
   late TextEditingController _allergiesController;
   late TextEditingController _emergencyContactController;
@@ -38,6 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     _nameController = TextEditingController(text: profile?.name ?? '');
     _ageController = TextEditingController(text: profile?.age.toString() ?? '');
+    _genderController =
+        TextEditingController(text: profile?.gender ?? 'Laki-laki');
     _bloodTypeController =
         TextEditingController(text: profile?.bloodType ?? '');
     _allergiesController = TextEditingController(
@@ -55,6 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _ageController.dispose();
+    _genderController.dispose();
     _bloodTypeController.dispose();
     _allergiesController.dispose();
     _emergencyContactController.dispose();
@@ -103,6 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       userId: authProvider.currentUser!.uid,
       name: _nameController.text.trim(),
       age: int.tryParse(_ageController.text.trim()) ?? 0,
+      gender: _genderController.text.trim(),
       bloodType: _bloodTypeController.text.trim(),
       allergies: _allergiesController.text
           .split(',')
@@ -292,6 +297,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               label: 'Umur',
               icon: Icons.cake,
               keyboardType: TextInputType.number,
+              enabled: _isEditing,
+            ),
+            const SizedBox(height: 12),
+            _buildTextField(
+              controller: _genderController,
+              label: 'Jenis Kelamin',
+              icon: Icons.person_outline,
               enabled: _isEditing,
             ),
           ],

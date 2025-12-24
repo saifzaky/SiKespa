@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../utils/validator.dart';
 import '../../utils/app_constants.dart';
 import './register_screen.dart';
+import './forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -60,8 +61,8 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue.shade400,
-              Colors.blue.shade700,
+              Colors.blue.shade600,
+              Colors.blue.shade800,
             ],
           ),
         ),
@@ -70,35 +71,43 @@ class _LoginScreenState extends State<LoginScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Card(
-                elevation: 8,
+                elevation: 12,
+                shadowColor: Colors.black.withOpacity(0.3),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  padding: const EdgeInsets.all(32.0),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Logo
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            'assets/images/logo_primary.png',
-                            width: 100,
-                            height: 100,
-                            errorBuilder: (context, error, stackTrace) {
-                              // Fallback to icon if image not found
-                              return Icon(
-                                Icons.medical_services,
-                                size: 80,
-                                color: Colors.blue.shade700,
-                              );
-                            },
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(60),
+                            child: Image.asset(
+                              'assets/images/logo_primary.png',
+                              width: 80,
+                              height: 80,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.medical_services,
+                                  size: 60,
+                                  color: Colors.blue.shade700,
+                                );
+                              },
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
                         Text(
                           AppConstants.appName,
                           style: Theme.of(context)
@@ -106,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               .headlineMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blue.shade700,
+                                color: Colors.blue.shade900,
                               ),
                         ),
                         const SizedBox(height: 8),
@@ -119,30 +128,48 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
+
+                        // Email Field
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             labelText: 'Email',
-                            prefixIcon: const Icon(Icons.email),
+                            hintText: 'masukkan@email.com',
+                            prefixIcon: Icon(Icons.email_outlined,
+                                color: Colors.blue.shade600),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Colors.blue.shade600,
+                                width: 2,
+                              ),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
                           ),
                           validator: Validator.email,
                         ),
                         const SizedBox(height: 16),
+
+                        // Password Field
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             labelText: 'Password',
-                            prefixIcon: const Icon(Icons.lock),
+                            hintText: 'Masukkan password',
+                            prefixIcon: Icon(Icons.lock_outlined,
+                                color: Colors.blue.shade600),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
+                                color: Colors.grey.shade600,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -153,41 +180,90 @@ class _LoginScreenState extends State<LoginScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Colors.blue.shade600,
+                                width: 2,
+                              ),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
                           ),
                           validator: Validator.password,
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
+                        // Forgot Password Link
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ForgotPasswordScreen(),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                            ),
+                            child: Text(
+                              'Lupa Password?',
+                              style: TextStyle(
+                                color: Colors.blue.shade700,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Login Button
                         SizedBox(
                           width: double.infinity,
-                          height: 48,
+                          height: 52,
                           child: ElevatedButton(
                             onPressed: authProvider.isLoading ? null : _login,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue.shade700,
+                              backgroundColor: Colors.blue.shade600,
                               foregroundColor: Colors.white,
+                              elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                             child: authProvider.isLoading
                                 ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
+                                    height: 24,
+                                    width: 24,
                                     child: CircularProgressIndicator(
                                       color: Colors.white,
-                                      strokeWidth: 2,
+                                      strokeWidth: 2.5,
                                     ),
                                   )
-                                : const Text(
-                                    'Login',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                : const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.login, size: 20),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Login',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                           ),
                         ),
                         const SizedBox(height: 16),
+
+                        // Register Link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -205,7 +281,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 );
                               },
-                              child: const Text('Daftar'),
+                              style: TextButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                              ),
+                              child: Text(
+                                'Daftar Sekarang',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue.shade700,
+                                ),
+                              ),
                             ),
                           ],
                         ),

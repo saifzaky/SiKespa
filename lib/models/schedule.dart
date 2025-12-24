@@ -1,12 +1,14 @@
 class Schedule {
   final String id;
   final String patientId;
-  final String type; // 'consultation' or 'medication'
+  final String type; // 'consultation', 'medication', or 'appointment'
   final String title;
   final DateTime date;
   final String time;
   final String notes;
   final bool reminderEnabled;
+  final String?
+      frequency; // 'daily', 'twice', 'three_times', 'custom' for medications
 
   Schedule({
     required this.id,
@@ -17,6 +19,7 @@ class Schedule {
     required this.time,
     required this.notes,
     this.reminderEnabled = true,
+    this.frequency,
   });
 
   Map<String, dynamic> toMap() {
@@ -28,6 +31,7 @@ class Schedule {
       'time': time,
       'notes': notes,
       'reminderEnabled': reminderEnabled,
+      'frequency': frequency,
     };
   }
 
@@ -41,6 +45,7 @@ class Schedule {
       time: map['time'] ?? '',
       notes: map['notes'] ?? '',
       reminderEnabled: map['reminderEnabled'] ?? true,
+      frequency: map['frequency'],
     );
   }
 
@@ -54,4 +59,8 @@ class Schedule {
   bool get isUpcoming {
     return date.isAfter(DateTime.now());
   }
+
+  bool get isMedication => type == 'medication';
+
+  bool get isConsultation => type == 'consultation';
 }

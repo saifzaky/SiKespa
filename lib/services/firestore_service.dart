@@ -41,10 +41,10 @@ class FirestoreService {
 
   // ========== VITAL SIGNS ==========
 
-  Future<void> addVitalSigns(VitalSigns vitalSigns) async {
+  Future<void> addVitalSigns(String userId, VitalSigns vitalSigns) async {
     await _firestore
         .collection('patients')
-        .doc(vitalSigns.patientId)
+        .doc(userId)
         .collection('vitalSigns')
         .add(vitalSigns.toMap());
   }
@@ -214,5 +214,19 @@ class FirestoreService {
         snapshot.docs
             .map((doc) => PatientProfile.fromMap(doc.data(), doc.id))
             .toList());
+  }
+
+  Future<void> deletePatient(String userId) async {
+    try {
+      // Delete patient document
+      await _firestore.collection('patients').doc(userId).delete();
+
+      // Note: Firestore doesn't delete subcollections automatically
+      // In production, you should use a Cloud Function to clean up subcollections
+      print('Patient deleted: $userId');
+    } catch (e) {
+      print('Error deleting patient: $e');
+      rethrow;
+    }
   }
 }

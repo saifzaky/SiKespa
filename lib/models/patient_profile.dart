@@ -3,6 +3,7 @@ class PatientProfile {
   final String userId;
   final String name;
   final int age;
+  final String gender;
   final String bloodType;
   final List<String> allergies;
   final String emergencyContact;
@@ -14,6 +15,7 @@ class PatientProfile {
     required this.userId,
     required this.name,
     required this.age,
+    required this.gender,
     required this.bloodType,
     required this.allergies,
     required this.emergencyContact,
@@ -27,6 +29,7 @@ class PatientProfile {
       'userId': userId,
       'name': name,
       'age': age,
+      'gender': gender,
       'bloodType': bloodType,
       'allergies': allergies,
       'emergencyContact': emergencyContact,
@@ -41,6 +44,7 @@ class PatientProfile {
       userId: map['userId'] ?? '',
       name: map['name'] ?? '',
       age: map['age'] ?? 0,
+      gender: map['gender'] ?? 'Laki-laki',
       bloodType: map['bloodType'] ?? '',
       allergies: List<String>.from(map['allergies'] ?? []),
       emergencyContact: map['emergencyContact'] ?? '',
@@ -54,6 +58,7 @@ class PatientProfile {
     String? userId,
     String? name,
     int? age,
+    String? gender,
     String? bloodType,
     List<String>? allergies,
     String? emergencyContact,
@@ -65,6 +70,7 @@ class PatientProfile {
       userId: userId ?? this.userId,
       name: name ?? this.name,
       age: age ?? this.age,
+      gender: gender ?? this.gender,
       bloodType: bloodType ?? this.bloodType,
       allergies: allergies ?? this.allergies,
       emergencyContact: emergencyContact ?? this.emergencyContact,

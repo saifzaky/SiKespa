@@ -82,6 +82,31 @@ class AuthService {
           .doc(user.uid)
           .set(userModel.toMap());
 
+      // Auto-create PatientProfile if role is patient
+      if (role == AppConstants.rolePatient) {
+        AppLogger.i('Creating patient profile for: $email');
+
+        // Import statement needed at top: import '../models/patient_profile.dart';
+        final patientProfile = {
+          'id': user.uid,
+          'userId': user.uid,
+          'name': name,
+          'age': 0, // Will be updated later
+          'bloodType': 'A+', // Default, will be updated later
+          'allergies': [],
+          'emergencyContact': '',
+          'insuranceNumber': '',
+          'photoUrl': null,
+        };
+
+        await _firestore
+            .collection(AppConstants.patientsCollection)
+            .doc(user.uid)
+            .set(patientProfile);
+
+        AppLogger.i('Patient profile created successfully');
+      }
+
       AppLogger.i('User registered successfully: $email');
       return Result.success(userModel);
     } on FirebaseAuthException catch (e, stackTrace) {
