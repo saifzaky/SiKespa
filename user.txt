@@ -1,2 +1,4 @@
-admin = admin@sikespa.com
-adminsikespa
+admin = {
+    email: admin@sikespa.com,
+    password: adminsikespa
+}
