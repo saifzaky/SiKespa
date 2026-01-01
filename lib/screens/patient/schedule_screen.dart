@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -15,7 +17,7 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  final FirestoreService _firestoreService = FirestoreService();
+  final firestoreService = FirestoreService();
   final NotificationService _notificationService = NotificationService();
 
   DateTime _focusedDay = DateTime.now();
@@ -39,8 +41,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         foregroundColor: Colors.white,
       ),
       body: StreamBuilder<List<Schedule>>(
-        stream:
-            _firestoreService.streamSchedules(authProvider.currentUser!.uid),
+        stream: firestoreService.streamSchedules(authProvider.currentUser!.uid),
         builder: (context, snapshot) {
           final schedules = snapshot.data ?? [];
 
@@ -118,7 +119,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           return _ScheduleCard(
                             schedule: schedule,
                             onDelete: () async {
-                              await _firestoreService.deleteSchedule(
+                              await firestoreService.deleteSchedule(
                                 authProvider.currentUser!.uid,
                                 schedule.id,
                               );
@@ -151,7 +152,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       context: context,
       builder: (context) => _AddScheduleDialog(
         onAdd: (schedule) async {
-          await _firestoreService.addSchedule(schedule);
+          await firestoreService.addSchedule(schedule);
 
           if (schedule.reminderEnabled) {
             await _notificationService.scheduleMedicationReminder(
@@ -296,7 +297,7 @@ class _AddScheduleDialogState extends State<_AddScheduleDialog> {
   final _timeController = TextEditingController();
 
   String _type = 'consultation';
-  DateTime _selectedDate = DateTime.now();
+  final DateTime _selectedDate = DateTime.now();
   bool _reminderEnabled = true;
 
   @override

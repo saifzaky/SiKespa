@@ -24,7 +24,7 @@ class DoctorPatientDetailScreen extends StatefulWidget {
 class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final FirestoreService _firestoreService = FirestoreService();
+  final firestoreService = FirestoreService();
 
   @override
   void initState() {
@@ -255,7 +255,7 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
 
           // Latest Vital Signs
           StreamBuilder<VitalSigns?>(
-            stream: _firestoreService
+            stream: firestoreService
                 .streamVitalSigns(widget.patient.userId)
                 .map((list) => list.isNotEmpty ? list.first : null),
             builder: (context, snapshot) {
@@ -398,7 +398,7 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
   // ===== VITAL SIGNS TAB =====
   Widget _buildVitalSignsTab() {
     return StreamBuilder<List<VitalSigns>>(
-      stream: _firestoreService.streamVitalSigns(widget.patient.userId),
+      stream: firestoreService.streamVitalSigns(widget.patient.userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -524,7 +524,7 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
   // ===== RECORDS TAB =====
   Widget _buildRecordsTab() {
     return StreamBuilder<List<MedicalRecord>>(
-      stream: _firestoreService.streamMedicalRecords(widget.patient.userId),
+      stream: firestoreService.streamMedicalRecords(widget.patient.userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -605,7 +605,7 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
   Widget _buildPrescriptionsTab() {
     return StreamBuilder<List<Prescription>>(
       stream:
-          _firestoreService.streamPatientPrescriptions(widget.patient.userId),
+          firestoreService.streamPatientPrescriptions(widget.patient.userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

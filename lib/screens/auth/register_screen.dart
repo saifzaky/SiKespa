@@ -84,7 +84,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.white.withOpacity(0.2),
+                        backgroundColor: Colors.white.withValues(alpha: 0.2),
                       ),
                     ),
                   ],
@@ -93,7 +93,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 Card(
                   elevation: 12,
-                  shadowColor: Colors.black.withOpacity(0.3),
+                  shadowColor: Colors.black.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),

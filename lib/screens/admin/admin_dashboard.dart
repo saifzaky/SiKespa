@@ -16,7 +16,7 @@ class AdminDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    final FirestoreService _firestoreService = FirestoreService();
+    final firestoreService = FirestoreService();
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -84,10 +84,10 @@ class AdminDashboard extends StatelessWidget {
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   width: 1.5,
                                 ),
                               ),
@@ -123,7 +123,7 @@ class AdminDashboard extends StatelessWidget {
                                           shadows: [
                                             Shadow(
                                               color:
-                                                  Colors.black.withOpacity(0.2),
+                                                  Colors.black.withValues(alpha: 0.2),
                                               offset: const Offset(0, 2),
                                               blurRadius: 4,
                                             ),
@@ -133,7 +133,7 @@ class AdminDashboard extends StatelessWidget {
                                       Text(
                                         'Sistem Informasi Kesehatan',
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.95),
+                                          color: Colors.white.withValues(alpha: 0.95),
                                           fontSize: 10,
                                           fontWeight: FontWeight.w500,
                                           letterSpacing: 0.3,
@@ -156,7 +156,7 @@ class AdminDashboard extends StatelessWidget {
                                   Text(
                                     'Selamat Datang',
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.9),
+                                      color: Colors.white.withValues(alpha: 0.9),
                                       fontSize: 14,
                                     ),
                                   ),
@@ -185,7 +185,7 @@ class AdminDashboard extends StatelessWidget {
                                           boxShadow: [
                                             BoxShadow(
                                               color: Colors.orange
-                                                  .withOpacity(0.3),
+                                                  .withValues(alpha: 0.3),
                                               blurRadius: 4,
                                               offset: const Offset(0, 2),
                                             ),
@@ -234,7 +234,7 @@ class AdminDashboard extends StatelessWidget {
             // Statistics Cards
             SliverToBoxAdapter(
               child: StreamBuilder<List<PatientProfile>>(
-                stream: _firestoreService.streamAllPatients(),
+                stream: firestoreService.streamAllPatients(),
                 builder: (context, snapshot) {
                   final patients = snapshot.data ?? [];
                   final totalPatients = patients.length;
@@ -502,7 +502,7 @@ class AdminDashboard extends StatelessWidget {
 
             // Patient List
             StreamBuilder<List<PatientProfile>>(
-              stream: _firestoreService.streamAllPatients(),
+              stream: firestoreService.streamAllPatients(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const SliverToBoxAdapter(
@@ -605,7 +605,7 @@ class AdminDashboard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -645,12 +645,12 @@ class AdminDashboard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [color.withOpacity(0.8), color],
+          colors: [color.withValues(alpha: 0.8), color],
         ),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -664,7 +664,7 @@ class AdminDashboard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(icon, color: Colors.white, size: 16),
@@ -686,7 +686,7 @@ class AdminDashboard extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 8,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -704,7 +704,7 @@ class AdminDashboard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -727,7 +727,7 @@ class AdminDashboard extends StatelessWidget {
             }
           },
           borderRadius: BorderRadius.circular(16),
-          hoverColor: Colors.blue.shade50.withOpacity(0.3),
+          hoverColor: Colors.blue.shade50.withValues(alpha: 0.3),
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -749,7 +749,7 @@ class AdminDashboard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.withOpacity(0.2),
+                        color: Colors.blue.withValues(alpha: 0.2),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

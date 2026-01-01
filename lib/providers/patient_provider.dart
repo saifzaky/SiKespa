@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import '../models/patient_profile.dart';
 import '../models/vital_signs.dart';
 import '../services/firestore_service.dart';
+import '../utils/logger.dart';
 
 class PatientProvider with ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
+  final firestoreService = FirestoreService();
   PatientProfile? _currentProfile;
   VitalSigns? _latestVitalSigns;
   bool _isLoading = false;
@@ -18,12 +19,12 @@ class PatientProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _currentProfile = await _firestoreService.getPatientProfile(userId);
+      _currentProfile = await firestoreService.getPatientProfile(userId);
       if (_currentProfile != null) {
-        _latestVitalSigns = await _firestoreService.getLatestVitalSigns(userId);
+        _latestVitalSigns = await firestoreService.getLatestVitalSigns(userId);
       }
     } catch (e) {
-      print('Error loading patient data: $e');
+      AppLogger.e('Error loading patient data', e);
     }
 
     _isLoading = false;
@@ -31,13 +32,13 @@ class PatientProvider with ChangeNotifier {
   }
 
   Future<void> updateProfile(PatientProfile profile) async {
-    await _firestoreService.createOrUpdatePatientProfile(profile);
+    await firestoreService.createOrUpdatePatientProfile(profile);
     _currentProfile = profile;
     notifyListeners();
   }
 
   Future<void> addVitalSigns(String userId, VitalSigns vitalSigns) async {
-    await _firestoreService.addVitalSigns(userId, vitalSigns);
+    await firestoreService.addVitalSigns(userId, vitalSigns);
     _latestVitalSigns = vitalSigns;
     notifyListeners();
   }

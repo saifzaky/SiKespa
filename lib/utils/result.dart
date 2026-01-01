@@ -1,5 +1,8 @@
-/// Result pattern for better error handling
-/// Provides a way to return either success or failure without throwing exceptions
+/// Result pattern for better error handling.
+/// Provides a way to return either success or failure without throwing exceptions.
+library;
+
+// ignore_for_file: null_check_on_nullable_type_parameter
 
 class Result<T> {
   final T? data;

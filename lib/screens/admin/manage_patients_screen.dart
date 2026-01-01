@@ -12,7 +12,7 @@ class ManagePatientsScreen extends StatefulWidget {
 }
 
 class _ManagePatientsScreenState extends State<ManagePatientsScreen> {
-  final FirestoreService _firestoreService = FirestoreService();
+  final firestoreService = FirestoreService();
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -83,7 +83,7 @@ class _ManagePatientsScreenState extends State<ManagePatientsScreen> {
           // Patient List
           Expanded(
             child: StreamBuilder<List<PatientProfile>>(
-              stream: _firestoreService.streamAllPatients(),
+              stream: firestoreService.streamAllPatients(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());

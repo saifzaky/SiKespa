@@ -15,7 +15,7 @@ class AddVitalSignsScreen extends StatefulWidget {
 
 class _AddVitalSignsScreenState extends State<AddVitalSignsScreen> {
   final _formKey = GlobalKey<FormState>();
-  final FirestoreService _firestoreService = FirestoreService();
+  final firestoreService = FirestoreService();
 
   // Controllers
   final _systolicController = TextEditingController();
@@ -62,7 +62,7 @@ class _AddVitalSignsScreenState extends State<AddVitalSignsScreen> {
         notes: _notesController.text.trim(),
       );
 
-      await _firestoreService.addVitalSigns(userId, vitalSigns);
+      await firestoreService.addVitalSigns(userId, vitalSigns);
 
       if (!mounted) return;
 

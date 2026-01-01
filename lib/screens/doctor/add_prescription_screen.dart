@@ -26,7 +26,7 @@ class _AddPrescriptionScreenState extends State<AddPrescriptionScreen> {
   final _durationController = TextEditingController();
   final _instructionsController = TextEditingController();
 
-  final FirestoreService _firestoreService = FirestoreService();
+  final firestoreService = FirestoreService();
   bool _isLoading = false;
 
   @override
@@ -67,7 +67,7 @@ class _AddPrescriptionScreenState extends State<AddPrescriptionScreen> {
         isActive: true,
       );
 
-      await _firestoreService.addPrescription(prescription);
+      await firestoreService.addPrescription(prescription);
 
       if (mounted) {
         ErrorHandler.showSuccessSnackBar(

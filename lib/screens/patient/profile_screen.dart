@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import '../../providers/auth_provider.dart';
 import '../../providers/patient_provider.dart';
@@ -72,22 +74,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     setState(() => _isLoading = true);
 
+    // Get auth provider before async operation
     final authProvider = context.read<AuthProvider>();
-    final photoUrl = await _storageService.uploadProfilePhoto(
-      authProvider.currentUser!.uid,
-      File(image.path),
-    );
+    final userId = authProvider.currentUser!.uid;
 
-    if (photoUrl != null) {
+    try {
+      final photoUrl = await _storageService.uploadProfilePhoto(
+        userId,
+        File(image.path),
+      );
+
       setState(() {
         _newPhotoUrl = photoUrl;
         _isLoading = false;
       });
-    } else {
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Foto berhasil diupload')),
+        );
+      }
+    } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gagal upload foto')),
+          SnackBar(content: Text('Gagal upload foto: ${e.toString()}')),
         );
       }
     }

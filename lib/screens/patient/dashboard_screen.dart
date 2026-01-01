@@ -10,7 +10,6 @@ import './medical_records_screen.dart';
 import './treatment_history_screen.dart';
 import './schedule_screen.dart';
 import './vital_signs_history_screen.dart';
-import './add_vital_signs_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -20,7 +19,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final FirestoreService _firestoreService = FirestoreService();
+  final firestoreService = FirestoreService();
 
   @override
   void initState() {
@@ -58,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.lightBlue.withOpacity(0.3),
+                    color: Colors.lightBlue.withValues(alpha: 0.3),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -287,7 +286,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               // Upcoming Schedules
               StreamBuilder<List<Schedule>>(
-                stream: _firestoreService
+                stream: firestoreService
                     .streamSchedules(authProvider.currentUser!.uid),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) return const SizedBox();
@@ -474,7 +473,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 40, color: color),

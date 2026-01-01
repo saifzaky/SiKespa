@@ -10,7 +10,7 @@ class AppLogger {
       lineLength: 120,
       colors: true,
       printEmojis: true,
-      printTime: true,
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     ),
   );
 
@@ -21,8 +21,9 @@ class AppLogger {
   /// Get logger based on environment
   static Logger get instance {
     // In production, use simple logger
-    // For now, use pretty logger for development
-    return _logger;
+    // In debug mode, use pretty logger
+    const bool kReleaseMode = bool.fromEnvironment('dart.vm.product');
+    return kReleaseMode ? _productionLogger : _logger;
   }
 
   /// Log debug message

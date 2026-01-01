@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import '../../models/patient_profile.dart';
 import '../../services/firestore_service.dart';
@@ -130,7 +132,7 @@ class _CompleteProfileDialogState extends State<CompleteProfileDialog> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -154,7 +156,7 @@ class _CompleteProfileDialogState extends State<CompleteProfileDialog> {
                     'Data ini penting untuk pelayanan kesehatan yang lebih baik',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                     textAlign: TextAlign.center,
                   ),

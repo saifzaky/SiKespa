@@ -6,6 +6,7 @@ import '../models/treatment_history.dart';
 import '../models/schedule.dart';
 import '../models/prescription.dart';
 import '../models/treatment_note.dart';
+import '../utils/logger.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -27,7 +28,7 @@ class FirestoreService {
       }
       return null;
     } catch (e) {
-      print('Error getting patient profile: $e');
+      AppLogger.e('Error getting patient profile', e);
       return null;
     }
   }
@@ -66,7 +67,7 @@ class FirestoreService {
       }
       return null;
     } catch (e) {
-      print('Error getting latest vital signs: $e');
+      AppLogger.e('Error getting latest vital signs', e);
       return null;
     }
   }
@@ -192,7 +193,7 @@ class FirestoreService {
           .map((doc) => Schedule.fromMap(doc.data(), doc.id))
           .toList();
     } catch (e) {
-      print('Error getting upcoming schedules: $e');
+      AppLogger.e('Error getting upcoming schedules', e);
       return [];
     }
   }
@@ -206,7 +207,7 @@ class FirestoreService {
           .map((doc) => PatientProfile.fromMap(doc.data(), doc.id))
           .toList();
     } catch (e) {
-      print('Error getting all patients: $e');
+      AppLogger.e('Error getting all patients', e);
       return [];
     }
   }
@@ -225,9 +226,9 @@ class FirestoreService {
 
       // Note: Firestore doesn't delete subcollections automatically
       // In production, you should use a Cloud Function to clean up subcollections
-      print('Patient deleted: $userId');
+      AppLogger.i('Patient deleted: $userId');
     } catch (e) {
-      print('Error deleting patient: $e');
+      AppLogger.e('Error deleting patient', e);
       rethrow;
     }
   }
@@ -279,7 +280,7 @@ class FirestoreService {
           .where((p) => !p.isExpired)
           .toList();
     } catch (e) {
-      print('Error getting active prescriptions: $e');
+      AppLogger.e('Error getting active prescriptions', e);
       return [];
     }
   }
@@ -355,7 +356,7 @@ class FirestoreService {
       }
       return null;
     } catch (e) {
-      print('Error getting latest treatment note: $e');
+      AppLogger.e('Error getting latest treatment note', e);
       return null;
     }
   }

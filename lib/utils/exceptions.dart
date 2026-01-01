@@ -1,5 +1,6 @@
-/// Custom exceptions for SiKespa application
-/// Provides better error handling and user-friendly error messages
+/// Custom exceptions for SiKespa application.
+/// Provides better error handling and user-friendly error messages.
+library;
 
 /// Base exception class for all app-specific exceptions
 class AppException implements Exception {

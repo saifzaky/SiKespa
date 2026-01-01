@@ -105,7 +105,8 @@ class PdfService {
             // Profile Details
             _buildInfoRow('Nama Lengkap', profile.name),
             _buildInfoRow('Umur', '${profile.age} tahun'),
-            _buildInfoRow('Jenis Kelamin', profile.gender ?? '-'),
+            _buildInfoRow('Jenis Kelamin',
+                profile.gender.isNotEmpty ? profile.gender : '-'),
             _buildInfoRow('Golongan Darah', profile.bloodType),
 
             pw.SizedBox(height: 20),

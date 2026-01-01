@@ -24,7 +24,7 @@ class _AddTreatmentNoteScreenState extends State<AddTreatmentNoteScreen> {
   final _treatmentController = TextEditingController();
   final _followUpController = TextEditingController();
 
-  final FirestoreService _firestoreService = FirestoreService();
+  final firestoreService = FirestoreService();
   bool _isLoading = false;
   DateTime? _nextAppointment;
 
@@ -71,7 +71,7 @@ class _AddTreatmentNoteScreenState extends State<AddTreatmentNoteScreen> {
         nextAppointment: _nextAppointment,
       );
 
-      await _firestoreService.addTreatmentNote(note);
+      await firestoreService.addTreatmentNote(note);
 
       if (mounted) {
         ErrorHandler.showSuccessSnackBar(

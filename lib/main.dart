@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
           scaffoldBackgroundColor: AppColors.background,
-          appBarTheme: AppBarTheme(
+          appBarTheme: const AppBarTheme(
             centerTitle: true,
             elevation: 0,
             backgroundColor: AppColors.primary,
