@@ -84,6 +84,25 @@ class FirestoreService {
             .toList());
   }
 
+  Future<void> updateVitalSigns(
+      String patientId, String vitalSignsId, VitalSigns vitalSigns) async {
+    await _firestore
+        .collection('patients')
+        .doc(patientId)
+        .collection('vitalSigns')
+        .doc(vitalSignsId)
+        .update(vitalSigns.toMap());
+  }
+
+  Future<void> deleteVitalSigns(String patientId, String vitalSignsId) async {
+    await _firestore
+        .collection('patients')
+        .doc(patientId)
+        .collection('vitalSigns')
+        .doc(vitalSignsId)
+        .delete();
+  }
+
   // ========== MEDICAL RECORDS ==========
 
   Future<void> addMedicalRecord(MedicalRecord record) async {
@@ -322,11 +341,15 @@ class FirestoreService {
     return _firestore
         .collection('treatment_notes')
         .where('patientId', isEqualTo: patientId)
-        .orderBy('date', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => TreatmentNote.fromMap(doc.data()))
-            .toList());
+        .map((snapshot) {
+      final notes = snapshot.docs
+          .map((doc) => TreatmentNote.fromMap(doc.data()))
+          .toList();
+      // Sort client-side to avoid composite index requirement
+      notes.sort((a, b) => b.date.compareTo(a.date));
+      return notes;
+    });
   }
 
   // Get treatment notes by doctor

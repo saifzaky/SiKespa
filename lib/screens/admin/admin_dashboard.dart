@@ -122,8 +122,8 @@ class AdminDashboard extends StatelessWidget {
                                           letterSpacing: 1.2,
                                           shadows: [
                                             Shadow(
-                                              color:
-                                                  Colors.black.withValues(alpha: 0.2),
+                                              color: Colors.black
+                                                  .withValues(alpha: 0.2),
                                               offset: const Offset(0, 2),
                                               blurRadius: 4,
                                             ),
@@ -133,7 +133,8 @@ class AdminDashboard extends StatelessWidget {
                                       Text(
                                         'Sistem Informasi Kesehatan',
                                         style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.95),
+                                          color: Colors.white
+                                              .withValues(alpha: 0.95),
                                           fontSize: 10,
                                           fontWeight: FontWeight.w500,
                                           letterSpacing: 0.3,
@@ -156,7 +157,8 @@ class AdminDashboard extends StatelessWidget {
                                   Text(
                                     'Selamat Datang',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.9),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.9),
                                       fontSize: 14,
                                     ),
                                   ),
@@ -378,6 +380,36 @@ class AdminDashboard extends StatelessWidget {
                                           },
                                         ),
                                       ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: _buildModernQuickAction(
+                                          context,
+                                          icon: Icons.history,
+                                          label: 'Manage Riwayat',
+                                          color: Colors.purple,
+                                          onTap: () {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: const Row(
+                                                  children: [
+                                                    Icon(Icons.schedule,
+                                                        color: Colors.white),
+                                                    SizedBox(width: 12),
+                                                    Text(
+                                                        'Coming Soon! Fitur ini akan segera hadir.'),
+                                                  ],
+                                                ),
+                                                backgroundColor: Colors.purple,
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                                duration:
+                                                    const Duration(seconds: 2),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
                                     ],
                                   );
                                 } else {
@@ -447,6 +479,33 @@ class AdminDashboard extends StatelessWidget {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   const AddMedicalRecordScreen(),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      _buildModernQuickAction(
+                                        context,
+                                        icon: Icons.history,
+                                        label: 'Manage Riwayat',
+                                        color: Colors.purple,
+                                        onTap: () {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: const Row(
+                                                children: [
+                                                  Icon(Icons.schedule,
+                                                      color: Colors.white),
+                                                  SizedBox(width: 12),
+                                                  Text(
+                                                      'Coming Soon! Fitur ini akan segera hadir.'),
+                                                ],
+                                              ),
+                                              backgroundColor: Colors.purple,
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              duration:
+                                                  const Duration(seconds: 2),
                                             ),
                                           );
                                         },

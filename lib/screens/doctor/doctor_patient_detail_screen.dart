@@ -3,10 +3,13 @@ import '../../models/patient_profile.dart';
 import '../../models/vital_signs.dart';
 import '../../models/medical_record.dart';
 import '../../models/prescription.dart';
+import '../../models/treatment_note.dart';
 import '../../services/firestore_service.dart';
 import 'package:intl/intl.dart';
 import 'add_prescription_screen.dart';
 import 'add_treatment_note_screen.dart';
+import 'add_vital_signs_screen.dart';
+import 'add_medical_record_screen.dart';
 
 class DoctorPatientDetailScreen extends StatefulWidget {
   final PatientProfile patient;
@@ -29,7 +32,7 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -55,6 +58,7 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
           tabs: const [
             Tab(icon: Icon(Icons.person), text: 'Overview'),
             Tab(icon: Icon(Icons.show_chart), text: 'Vital Signs'),
+            Tab(icon: Icon(Icons.note_alt), text: 'Treatment'),
             Tab(icon: Icon(Icons.folder), text: 'Records'),
             Tab(icon: Icon(Icons.medication), text: 'Prescriptions'),
           ],
@@ -65,6 +69,7 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
         children: [
           _buildOverviewTab(),
           _buildVitalSignsTab(),
+          _buildTreatmentTab(),
           _buildRecordsTab(),
           _buildPrescriptionsTab(),
         ],
@@ -107,6 +112,36 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
               ),
             ),
             const SizedBox(height: 24),
+            // Tambah Vital Signs
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.monitor_heart, color: Colors.red.shade700),
+              ),
+              title: const Text(
+                'Tambah Vital Signs',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: const Text('Catat data vital signs pasien'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddVitalSignsScreen(
+                      patient: widget.patient,
+                    ),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            // Tambah Resep
             ListTile(
               leading: Container(
                 padding: const EdgeInsets.all(10),
@@ -156,6 +191,35 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
                   context,
                   MaterialPageRoute(
                     builder: (context) => AddTreatmentNoteScreen(
+                      patient: widget.patient,
+                    ),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            // Tambah Rekam Medis
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.folder_shared, color: Colors.purple.shade700),
+              ),
+              title: const Text(
+                'Tambah Rekam Medis',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: const Text('Upload rekam medis pasien'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddMedicalRecordScreen(
                       patient: widget.patient,
                     ),
                   ),
@@ -518,6 +582,165 @@ class _DoctorPatientDetailScreenState extends State<DoctorPatientDetailScreen>
           },
         );
       },
+    );
+  }
+
+  // ===== TREATMENT NOTES TAB =====
+  Widget _buildTreatmentTab() {
+    return StreamBuilder<List<TreatmentNote>>(
+      stream:
+          firestoreService.streamPatientTreatmentNotes(widget.patient.userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.note_alt_outlined,
+                    size: 64, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                Text(
+                  'Belum ada catatan treatment',
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Tekan tombol + untuk menambah catatan',
+                  style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final notes = snapshot.data!;
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: notes.length,
+          itemBuilder: (context, index) {
+            final note = notes[index];
+            return Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header with date and doctor
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.note_alt,
+                            color: Colors.orange.shade700,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                DateFormat('dd MMM yyyy').format(note.date),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                'Dr. ${note.doctorName}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 24),
+                    // Diagnosis
+                    _buildTreatmentInfoRow('Diagnosis', note.diagnosis),
+                    const SizedBox(height: 8),
+                    // Treatment
+                    _buildTreatmentInfoRow('Perawatan', note.treatment),
+                    // Follow-up instructions
+                    if (note.followUpInstructions.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      _buildTreatmentInfoRow(
+                          'Instruksi', note.followUpInstructions),
+                    ],
+                    // Next appointment
+                    if (note.nextAppointment != null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.blue.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.event,
+                                size: 16, color: Colors.blue.shade700),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Kontrol: ${DateFormat('dd MMM yyyy').format(note.nextAppointment!)}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.blue.shade700,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildTreatmentInfoRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 80,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ),
+        const Text(': '),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 14),
+          ),
+        ),
+      ],
     );
   }
 
