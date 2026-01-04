@@ -8,6 +8,7 @@ import '../../widgets/vital_sign_card.dart';
 import './profile_screen.dart';
 import './medical_records_screen.dart';
 import './treatment_history_screen.dart';
+import './treatment_notes_screen.dart';
 import './schedule_screen.dart';
 import './vital_signs_history_screen.dart';
 
@@ -435,6 +436,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const ScheduleScreen(),
+                                ),
+                              ),
+                            ),
+                            _buildMenuCard(
+                              context,
+                              'Catatan Dokter',
+                              Icons.note_alt,
+                              Colors.purple,
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const TreatmentNotesScreen(),
                                 ),
                               ),
                             ),
