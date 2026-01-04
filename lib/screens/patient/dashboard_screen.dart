@@ -11,6 +11,8 @@ import './treatment_history_screen.dart';
 import './treatment_notes_screen.dart';
 import './schedule_screen.dart';
 import './vital_signs_history_screen.dart';
+import './medication_reminders_screen.dart';
+import './prescriptions_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -449,6 +451,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       const TreatmentNotesScreen(),
+                                ),
+                              ),
+                            ),
+                            _buildMenuCard(
+                              context,
+                              'Pengingat Obat',
+                              Icons.medication,
+                              Colors.orange,
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const MedicationRemindersScreen(),
+                                ),
+                              ),
+                            ),
+                            _buildMenuCard(
+                              context,
+                              'Resep Obat',
+                              Icons.receipt_long,
+                              Colors.teal,
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const PrescriptionsScreen(),
                                 ),
                               ),
                             ),
